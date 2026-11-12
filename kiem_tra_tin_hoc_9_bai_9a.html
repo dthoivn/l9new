@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiểm tra Tin học 9 - Bài 9a</title>
+<style>
+:root{--primary:#176b87;--primary2:#0e7490;--bg:#f3f7fa;--ink:#183042;--muted:#617586;--line:#dce6ec;--good:#15803d;--bad:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--ink);line-height:1.55}
+header{background:linear-gradient(125deg,#0f526b,#1685a3);color:white;padding:30px 18px}
+.hero{max-width:920px;margin:auto}
+header h1{margin:0 0 6px;font-size:clamp(23px,4vw,32px)}
+header p{margin:4px 0;opacity:.94}
+main{max-width:920px;margin:24px auto;padding:0 14px 50px}
+.panel,.question{background:#fff;border:1px solid var(--line);border-radius:15px;padding:20px;margin-bottom:16px;box-shadow:0 5px 18px #15394b0a}
+.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+label.field{display:block;font-weight:700;font-size:14px;color:#355166}
+input[type=text]{width:100%;margin-top:6px;padding:12px;border:1px solid #cbd8e0;border-radius:9px;font:inherit}
+.instructions{color:var(--muted);font-size:14px}
+.qhead{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.qnum{flex:0 0 34px;height:34px;border-radius:10px;background:#e3f3f8;color:#075c78;display:grid;place-items:center;font-weight:800}
+.qtitle{font-weight:700;padding-top:4px}
+.option{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid #e5edf1;border-radius:10px;margin:8px 0;cursor:pointer;transition:.15s}
+.option:hover{border-color:#8bbdcb;background:#f7fcfd}
+.option input{margin-top:4px;accent-color:var(--primary2)}
+.actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+button{border:0;border-radius:11px;background:var(--primary);color:white;padding:13px 22px;font-weight:700;font-size:16px;cursor:pointer}
+button:hover{background:#0d536c}
+button:disabled{opacity:.55;cursor:not-allowed}
+#status{font-size:14px;color:var(--muted)}
+#result{display:none;margin-top:18px}
+.score{font-size:24px;font-weight:800;color:var(--primary)}
+.review{border-top:1px solid var(--line);padding:12px 0}
+.review strong{display:block}
+.correct{color:var(--good)}.incorrect{color:var(--bad)}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+@media(max-width:600px){.meta{grid-template-columns:1fr}.panel,.question{padding:16px}}
+@media print{body{background:white}.actions,header{print-color-adjust:exact}.actions button{display:none}}
+</style>
+</head>
+<body>
+<header><div class="hero">
+<h1>BÀI KIỂM TRA TIN HỌC 9</h1>
+<p><b>Bài 9a – Sử dụng công cụ xác thực dữ liệu</b></p>
+<p>Phần trắc nghiệm · Thời gian làm bài: 35 phút · 10 câu · 5,0 điểm</p>
+</div></header>
+<main>
+<section class="panel">
+<h2 style="margin-top:0">Thông tin học sinh</h2>
+<div class="meta">
+<label class="field">Họ và tên
+<input id="studentName" type="text" placeholder="Nhập họ và tên"></label>
+<label class="field">Lớp
+<input id="studentClass" type="text" placeholder="Ví dụ: 9A1"></label>
+</div>
+<p class="instructions">Mỗi câu chỉ chọn một đáp án. Mỗi câu đúng được 0,5 điểm. Khi nhấn <b>Nộp Bài</b>, hệ thống chấm điểm và tải kết quả thành tệp Word (.docx).</p>
+</section>
+<form id="quizForm">
+<div id="questions"></div>
+<section class="panel actions">
+<button type="submit" id="submitBtn">Nộp Bài</button>
+<span id="status">Hãy kiểm tra lại câu trả lời trước khi nộp.</span>
+</section>
+</form>
+<section id="result" class="panel" aria-live="polite">
+<h2 style="margin-top:0">Kết quả bài làm</h2>
+<div id="scoreText" class="score"></div>
+<div id="review"></div>
+</section>
+</main>
+<footer>Đề kiểm tra được xây dựng theo nội dung Bài 9a, SGK Tin học 9 – Kết nối tri thức với cuộc sống.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script>
+const questions = [
+ {q:"Công cụ Data Validation trong phần mềm bảng tính có chức năng chính là gì?",o:["Tự động tính tổng các giá trị trong bảng.","Kiểm soát và giới hạn dữ liệu được phép nhập vào ô tính.","Thay đổi màu nền của ô tính.","Sắp xếp dữ liệu theo thứ tự tăng dần."],a:1},
+ {q:"Muốn tạo danh sách lựa chọn có sẵn trong một ô tính, em cần chọn kiểu xác thực dữ liệu nào?",o:["Whole number.","Decimal.","List.","Date."],a:2},
+ {q:"Trong Data Validation, kiểu Whole number được sử dụng để xác thực loại dữ liệu nào?",o:["Số nguyên.","Số thập phân.","Ngày tháng.","Văn bản."],a:0},
+ {q:"Khi muốn giới hạn số tiền nhập vào ô tính phải lớn hơn 0, em nên sử dụng kiểu xác thực nào?",o:["List.","Date.","Text length.","Decimal hoặc Whole number."],a:3},
+ {q:"Trong hộp thoại Data Validation, mục Source có chức năng gì khi sử dụng kiểu List?",o:["Chọn màu cho danh sách.","Xác định vùng dữ liệu chứa các giá trị lựa chọn.","Đặt tên cho trang tính.","Xác định công thức tính tổng."],a:1},
+ {q:"Muốn giới hạn dữ liệu nhập vào một ô chỉ được nằm trong khoảng từ 1 đến 10, em chọn kiểu xác thực nào?",o:["List.","Date.","Whole number.","Text length."],a:2},
+ {q:"Thẻ Input Message trong hộp thoại Data Validation dùng để làm gì?",o:["Hiển thị thông báo hướng dẫn khi người dùng chọn ô nhập liệu.","Hiển thị thông báo khi lưu tệp.","Tự động xóa dữ liệu sai.","Tính toán giá trị trong ô."],a:0},
+ {q:"Thẻ Error Alert có tác dụng gì?",o:["Tạo danh sách thả xuống.","Định dạng dữ liệu.","Hiển thị cảnh báo khi người dùng nhập dữ liệu không hợp lệ.","Tạo biểu đồ."],a:2},
+ {q:"Để tạo danh sách các khoản chi gồm Ăn, Di chuyển, Học tập, Sức khỏe, Giải trí, em nên sử dụng công cụ nào?",o:["Sort.","Data Validation – List.","Conditional Formatting.","AutoSum."],a:1},
+ {q:"Khi nhập số tiền chi tiêu, yêu cầu dữ liệu phải lớn hơn 0. Nếu người dùng nhập số âm, cách xử lí phù hợp nhất là gì?",o:["Cho phép nhập vì Excel tự sửa dữ liệu.","Chuyển số âm thành văn bản.","Xóa toàn bộ bảng tính.","Thiết lập Data Validation và thông báo lỗi khi nhập dữ liệu không hợp lệ."],a:3}
+];
+const letters=["A","B","C","D"];
+const container=document.getElementById("questions");
+questions.forEach((item,i)=>{
+ const section=document.createElement("section");section.className="question";
+ const head=document.createElement("div");head.className="qhead";
+ head.innerHTML=`<span class="qnum">${i+1}</span><div class="qtitle">${item.q}</div>`;
+ section.appendChild(head);
+ item.o.forEach((option,j)=>{
+  const label=document.createElement("label");label.className="option";
+  label.innerHTML=`<input type="radio" name="q${i}" value="${j}"><span><b>${letters[j]}.</b> ${option}</span>`;
+  section.appendChild(label);
+ });
+ container.appendChild(section);
+});
+let submitted=false;
+document.getElementById("quizForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ if(submitted)return;
+ const name=document.getElementById("studentName").value.trim();
+ const klass=document.getElementById("studentClass").value.trim();
+ if(!name||!klass){alert("Vui lòng nhập họ tên và lớp trước khi nộp bài.");return;}
+ const answers=questions.map((q,i)=>{const el=document.querySelector(`input[name="q${i}"]:checked`);return el?Number(el.value):-1;});
+ const unanswered=answers.filter(x=>x===-1).length;
+ if(unanswered && !confirm(`Em còn ${unanswered} câu chưa chọn. Vẫn nộp bài?`))return;
+ submitted=true;
+ document.querySelectorAll('input[type=radio],#studentName,#studentClass').forEach(x=>x.disabled=true);
+ document.getElementById("submitBtn").disabled=true;
+ const correct=answers.filter((a,i)=>a===questions[i].a).length;
+ const score=correct*0.5;
+ document.getElementById("scoreText").textContent=`${score.toFixed(1).replace(".",",")} / 5,0 điểm · ${correct}/10 câu đúng`;
+ const review=document.getElementById("review");
+ questions.forEach((q,i)=>{
+  const div=document.createElement("div");div.className="review";
+  const chosen=answers[i]===-1?"Chưa trả lời":`${letters[answers[i]]}. ${q.o[answers[i]]}`;
+  const right=`${letters[q.a]}. ${q.o[q.a]}`;
+  const ok=answers[i]===q.a;
+  div.innerHTML=`<strong class="${ok?"correct":"incorrect"}">Câu ${i+1}: ${ok?"Đúng": "Chưa đúng"}</strong><span>Đã chọn: ${chosen}</span><br><span>Đáp án đúng: ${right}</span>`;
+  review.appendChild(div);
+ });
+ document.getElementById("result").style.display="block";
+ document.getElementById("status").textContent="Đã nộp bài. Đang tạo tệp kết quả Word…";
+ document.getElementById("result").scrollIntoView({behavior:"smooth"});
+ try{await exportDocx(name,klass,answers,correct,score);}
+ catch(err){console.error(err);document.getElementById("status").textContent="Đã chấm điểm nhưng chưa xuất được DOCX. Hãy kiểm tra kết nối Internet rồi tải lại trang.";alert("Không thể tạo tệp DOCX. Vui lòng kiểm tra kết nối Internet và thử mở lại tệp HTML.");}
+});
+async function exportDocx(name,klass,answers,correct,score){
+ if(!window.docx)throw new Error("Thư viện DOCX chưa tải");
+ const {Document,Packer,Paragraph,TextRun,HeadingLevel,AlignmentType,Table,TableRow,TableCell,WidthType}=window.docx;
+ const children=[];
+ const p=(text,opts={})=>new Paragraph({children:[new TextRun({text,...opts})],spacing:{after:120}});
+ children.push(new Paragraph({text:"KẾT QUẢ KIỂM TRA TIN HỌC 9",heading:HeadingLevel.TITLE,alignment:AlignmentType.CENTER}));
+ children.push(new Paragraph({text:"Bài 9a – Sử dụng công cụ xác thực dữ liệu",alignment:AlignmentType.CENTER,spacing:{after:260}}));
+ children.push(p(`Họ và tên: ${name}`));
+ children.push(p(`Lớp: ${klass}`));
+ children.push(p(`Điểm trắc nghiệm: ${score.toFixed(1).replace(".",",")} / 5,0` ,{bold:true,color:"176B87",size:28}));
+ children.push(p(`Số câu đúng: ${correct}/10 · Số câu chưa đúng hoặc bỏ trống: ${10-correct}/10`));
+ children.push(new Paragraph({text:"CHI TIẾT BÀI LÀM",heading:HeadingLevel.HEADING_1,spacing:{before:240,after:160}}));
+ questions.forEach((q,i)=>{
+  const chosen=answers[i]===-1?"Chưa trả lời":`${letters[answers[i]]}. ${q.o[answers[i]]}`;
+  const right=`${letters[q.a]}. ${q.o[q.a]}`;
+  const ok=answers[i]===q.a;
+  children.push(new Paragraph({children:[new TextRun({text:`Câu ${i+1}: `,bold:true}),new TextRun(q.q)] ,spacing:{before:140,after:70}}));
+  children.push(p(`Học sinh chọn: ${chosen}`));
+  children.push(new Paragraph({children:[new TextRun({text:`Đáp án đúng: ${right}`,bold:true,color:ok?"15803D":"B91C1C"})],spacing:{after:150}}));
+ });
+ children.push(p("Ghi chú: Mỗi câu đúng được 0,5 điểm. Kết quả được hệ thống chấm tự động."));
+ const doc=new Document({sections:[{properties:{},children}]});
+ const blob=await Packer.toBlob(doc);
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ const safe=(name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9_-]+/g,"_")||"HocSinh");
+ a.href=url;a.download=`Ket_qua_Tin_hoc_9_Bai_9a_${safe}.docx`;
+ document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1500);
+ document.getElementById("status").textContent="Đã nộp bài và tải xuống tệp kết quả DOCX.";
+}
+</script>
+</body>
+</html>
